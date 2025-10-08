@@ -1,0 +1,23 @@
+name: watch-spirinc
+on:
+  schedule:
+    - cron: "*/10 * * * *"    # 10分ごと
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install playwright
+      - run: python -m playwright install --with-deps chromium
+      - env:
+          SPIR_COOKIE_NAME: ${{ secrets.SPIR_COOKIE_NAME }}
+          SPIR_COOKIE_VALUE: ${{ secrets.SPIR_COOKIE_VALUE }}
+          SPIR_COOKIE_DOMAIN: ${{ secrets.SPIR_COOKIE_DOMAIN }}
+          LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python monitor.py
